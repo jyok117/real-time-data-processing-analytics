@@ -31,6 +31,10 @@ while True:
 
     data = json.loads(msg.value().decode('utf-8'))
 
+    # Missing field: Set device_type to "unknown" if it's missing
+    if "device_type" not in data:
+        data["device_type"] = "unknown"
+
     # Transform: Mask IP addresses
     ip_parts = data.get("ip", "").split(".")
     if len(ip_parts) == 4:
