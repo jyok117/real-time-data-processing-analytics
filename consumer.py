@@ -10,6 +10,26 @@ CONSUMER_CONFIG = {
     'auto.offset.reset': 'earliest'
 }
 
+
+def process_message(message):
+    data = json.loads(message)
+
+    # Missing field: Set device_type to "unknown" if it's missing
+    if "device_type" not in data:
+        data["device_type"] = "unknown"
+
+    # Transform: Mask IP addresses
+    ip_parts = data.get("ip", "").split(".")
+    if len(ip_parts) == 4:
+        data["ip"] = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.xxx"
+
+    # Transform: Convert timestamp to human-readable format
+    timestamp = datetime.fromtimestamp(data["timestamp"], tz=timezone.utc)
+    data["timestamp"] = timestamp.strftime('%Y-%m-%dT%H:%M:%S%z')
+
+    return json.dumps(data)
+
+
 c = Consumer(CONSUMER_CONFIG)
 c.subscribe([IN_TOPIC])
 
@@ -29,20 +49,8 @@ while True:
             print('Consumer error: {}'.format(msg.error()))
             continue
 
-    data = json.loads(msg.value().decode('utf-8'))
-
-    # Missing field: Set device_type to "unknown" if it's missing
-    if "device_type" not in data:
-        data["device_type"] = "unknown"
-
-    # Transform: Mask IP addresses
-    ip_parts = data.get("ip", "").split(".")
-    if len(ip_parts) == 4:
-        data["ip"] = f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.xxx"
-
-    # Transform: Convert timestamp to human-readable format
-    timestamp = datetime.fromtimestamp(data["timestamp"], tz=timezone.utc)
-    data["timestamp"] = timestamp.strftime('%Y-%m-%dT%H:%M:%S%z')
+    data = msg.value().decode('utf-8')
+    data = process_message(data)
 
     print('Received message: {}'.format(data))
 
