@@ -1,13 +1,18 @@
 import json
 from datetime import datetime, timezone
 
-from confluent_kafka import KafkaError, Consumer
+from confluent_kafka import KafkaError, Consumer, Producer
 
 IN_TOPIC = 'user-login'
+OUT_TOPIC = 'processed-user-login'
+
 CONSUMER_CONFIG = {
     'bootstrap.servers': 'localhost:29092',
     'group.id': 'my-app',
     'auto.offset.reset': 'earliest'
+}
+PRODUCER_CONFIG = {
+    'bootstrap.servers': 'localhost:29092'
 }
 
 
@@ -40,12 +45,22 @@ def error_handler(msg):
         pass
 
 
-def main():
-    try:
-        c = Consumer(CONSUMER_CONFIG)
-        c.subscribe([IN_TOPIC])
+def delivery_report(err, msg):
+    if err is not None:
+        print('Message delivery failed: {}'.format(err))
+    else:
+        print('Message delivered to {} [{}]'.format(
+            msg.topic(), msg.partition()))
 
-        print('Consuming messages')
+
+def main():
+    c = Consumer(CONSUMER_CONFIG)
+    p = Producer(PRODUCER_CONFIG)
+
+    c.subscribe([IN_TOPIC])
+
+    print(IN_TOPIC + " >>> " + OUT_TOPIC)
+    try:
         while True:
             msg = c.poll(1.0)
 
@@ -54,14 +69,30 @@ def main():
             if msg.error():
                 error_handler(msg)
 
-            data = msg.value().decode('utf-8')
-            data = process_message(data)
+            # Consume the message from IN_TOPIC and process it
+            original_message = msg.value().decode('utf-8')
+            processed_message = process_message(original_message)
 
-            print('Received message: {}'.format(data))
+            # Produce the processed message to OUT_TOPIC
+            if processed_message:
+                p.produce(
+                    OUT_TOPIC,
+                    key=msg.key(),
+                    value=processed_message.encode('utf-8'),
+                    callback=delivery_report
+                )
+                p.flush()
+
+            print('Received message: {}'.format(original_message))
+            print('Processed message: {}'.format(processed_message))
+
     except KeyboardInterrupt:
         pass
     finally:
+        # Close the consumer and producer to commit final offsets and clean up
         c.close()
+        p.flush()
+        p.close()
 
 
 if __name__ == '__main__':
