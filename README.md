@@ -6,7 +6,7 @@ Fetch Data Ops / Data Engineer Take Home Exercise - Real Time Data Processing an
 
 ## Demo
 
-![](./assets/demo.gif)
+![](https://github.com/jyok117/real-time-data-processing-analytics/blob/main/assets/analytics-demo.gif)
 
 ## Requirements
 
