@@ -47,9 +47,27 @@ Received message: {"user_id": "912be752-589d-4b7a-a253-ed4b2f067dfe", "app_versi
 9. The processed message is then sent to a new Kafka topic `processed-user-login`.
 
 ```bash
-(.venv) $ python consumer.py
-user-login >>> processed-user-login
+(.venv) $ python consumer-1.py
+kafka topic (user-login) >>> kafka topic (processed-user-login)
 Received message: {"user_id": "ec7eb61a-65ca-4059-ba09-800b5a594f00", "app_version": "2.3.0", "ip": "156.125.84.252", "locale": "AR", "device_id": "e16dfeae-077e-4af1-bc85-68d4de452ef1", "timestamp": 1720624735, "device_type": "android"}
 Processed message: {"user_id": "ec7eb61a-65ca-4059-ba09-800b5a594f00", "app_version": "2.3.0", "ip": "156.125.84.xxx", "locale": "AR", "device_id": "e16dfeae-077e-4af1-bc85-68d4de452ef1", "timestamp": "2024-07-10T15:18:55+0000", "device_type": "android"}
 Message delivered to processed-user-login [0]
 ```
+
+10. For analytics, I will be using OpenSearch. Added OpenSearch and OpenSearch Dashboards services to the `docker-compose.yml` file and restarted the services.
+
+11. Created a new Python script to consume messages from the Kafka topic `processed-user-login` and indexes the messages to an OpenSearch index `processed-user-login-index`.
+
+```bash
+(.venv) $ python consumer-2.py
+kafka topic (processed-user-login) >>> opensearch index (processed-user-login-index)
+Indexed message 26bb5a0f-ee20-4f18-9937-0fb48e14fce8: created
+Indexed message 81ad63e4-c6eb-4d99-aba1-5259c1fe8352: created
+```
+
+12. Created an index pattern (`processed-user-login-index`) in OpenSearch Dashboard to visualize the indexed data. Created some visualizations to analyze the data with the following fields:
+
+- `device_type`
+- `locale`
+
+![](./assets/dashboard.png)
