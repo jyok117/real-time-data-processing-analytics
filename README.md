@@ -26,6 +26,8 @@ Fetch Data Ops / Data Engineer Take Home Exercise - Real Time Data Processing an
 
 ## Setup
 
+Clone the repository
+
 ```bash
 $ git clone https://github.com/jyok117/real-time-data-processing-analytics
 $ cd real-time-data-processing-analytics
@@ -36,10 +38,19 @@ Start the services
 The services include Kafka, Zookeeper, OpenSearch, OpenSearch Dashboards, `my-python-producer` and `my-consumer`
 
 ```bash
-$ docker-compose up
+$ docker-compose up --build
 ```
 
-The `my-python-producer` generates random user login data and sends it to the Kafka topic `user-login`. The [`consumer-1`](./src/consumer-1.py) consumes messages from the Kafka topic `user-login`, processes the messages, and sends the processed messages to the Kafka topic `processed-user-login`. The [`consumer-2`](./src/consumer-2.py) then consumes messages from the Kafka topic `processed-user-login`, indexes the messages to an OpenSearch index `processed-user-login-index`.
+The `my-python-producer` generates random user login data and sends it to the Kafka topic `user-login`.
+
+Check if the Kafka is receiving the data from the `my-python-producer`
+
+```bash
+$ KAFKA_CONTAINER=$(docker ps --filter "name=kafka" --format "{{.ID}}")
+$ docker exec -it $KAFKA_CONTAINER kafka-console-consumer --bootstrap-server localhost:9092 --topic user-login --group my-app
+```
+
+The [`consumer-1`](./src/consumer-1.py) consumes messages from the Kafka topic `user-login`, processes the messages, and sends the processed messages to the Kafka topic `processed-user-login`. The [`consumer-2`](./src/consumer-2.py) then consumes messages from the Kafka topic `processed-user-login`, indexes the messages to an OpenSearch index `processed-user-login-index`.
 
 The credentials for the OpenSearch and OpenSearch Dashboards are `admin:admin`.
 

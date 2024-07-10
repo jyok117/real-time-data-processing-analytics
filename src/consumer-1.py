@@ -1,18 +1,20 @@
+import os
 import json
-from datetime import datetime, timezone
 
+from datetime import datetime, timezone
 from confluent_kafka import KafkaError, Consumer, Producer
 
-IN_TOPIC = 'user-login'
-OUT_TOPIC = 'processed-user-login'
+IN_TOPIC = os.getenv('KAFKA_IN_TOPIC', 'user-login')
+OUT_TOPIC = os.getenv('KAFKA_OUT_TOPIC', 'processed-user-login')
+BOOTSTRAP_SERVERS = os.getenv('BOOTSTRAP_SERVERS', 'localhost:29092')
 
 CONSUMER_CONFIG = {
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': BOOTSTRAP_SERVERS,
     'group.id': 'my-app',
     'auto.offset.reset': 'earliest'
 }
 PRODUCER_CONFIG = {
-    'bootstrap.servers': 'localhost:29092'
+    'bootstrap.servers': BOOTSTRAP_SERVERS
 }
 
 
@@ -83,8 +85,8 @@ def main():
                 )
                 p.flush()
 
-            print('Received message: {}'.format(original_message))
-            print('Processed message: {}'.format(processed_message))
+            # print('Received message: {}'.format(original_message))
+            # print('Processed message: {}'.format(processed_message))
 
     except KeyboardInterrupt:
         pass

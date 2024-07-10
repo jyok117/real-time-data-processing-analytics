@@ -1,16 +1,17 @@
-import json
 import os
+import json
 
-from confluent_kafka import Consumer, KafkaError
-from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests.auth import HTTPBasicAuth
+from opensearchpy import OpenSearch, RequestsHttpConnection
+from confluent_kafka import Consumer, KafkaError
 
-IN_TOPIC = 'processed-user-login'
-OS_INDEX = 'processed-user-login-index'
+IN_TOPIC = os.getenv('KAFKA_OUT_TOPIC', 'processed-user-login')
+OS_INDEX = os.getenv('OS_INDEX', 'processed-user-login-index')
+BOOTSTRAP_SERVERS = os.getenv('BOOTSTRAP_SERVERS', 'localhost:29092')
 
 # Kafka consumer configuration
 CONSUMER_CONFIG = {
-    'bootstrap.servers': 'localhost:29092',
+    'bootstrap.servers': BOOTSTRAP_SERVERS,
     'group.id': 'my-app',
     'auto.offset.reset': 'earliest'
 }

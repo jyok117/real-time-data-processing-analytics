@@ -79,6 +79,20 @@ services:
     networks:
       - opensearch-net
 
+  my-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_IN_TOPIC: user-login
+      KAFKA_OUT_TOPIC: processed-user-login
+      OPENSEARCH_HOST: opensearch-node
+      OS_INDEX: processed-user-login-index
+    networks:
+      - kafka-network
+      - opensearch-net
+
 volumes:
   opensearch-data:
 
