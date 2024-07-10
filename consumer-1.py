@@ -59,7 +59,7 @@ def main():
 
     c.subscribe([IN_TOPIC])
 
-    print(IN_TOPIC + " >>> " + OUT_TOPIC)
+    print("kafka topic ({}) >>> kafka topic ({})".format(IN_TOPIC, OUT_TOPIC))
     try:
         while True:
             msg = c.poll(1.0)
