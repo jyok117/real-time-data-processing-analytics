@@ -30,28 +30,39 @@ def process_message(message):
     return json.dumps(data)
 
 
-c = Consumer(CONSUMER_CONFIG)
-c.subscribe([IN_TOPIC])
+def error_handler(msg):
+    if msg.error().code() == KafkaError._PARTITION_EOF:
+        # End of partition event
+        print('End of partition reached {} [{}]'.format(
+            msg.topic(), msg.partition()))
+    elif msg.error():
+        print('Consumer error: {}'.format(msg.error()))
+        pass
 
-print('Consuming messages')
 
-while True:
-    msg = c.poll(1.0)
+def main():
+    try:
+        c = Consumer(CONSUMER_CONFIG)
+        c.subscribe([IN_TOPIC])
 
-    if msg is None:
-        continue
-    if msg.error():
-        if msg.error().code() == KafkaError._PARTITION_EOF:
-            # End of partition event
-            print('End of partition reached {} [{}]'.format(
-                msg.topic(), msg.partition()))
-        elif msg.error():
-            print('Consumer error: {}'.format(msg.error()))
-            continue
+        print('Consuming messages')
+        while True:
+            msg = c.poll(1.0)
 
-    data = msg.value().decode('utf-8')
-    data = process_message(data)
+            if msg is None:
+                continue
+            if msg.error():
+                error_handler(msg)
 
-    print('Received message: {}'.format(data))
+            data = msg.value().decode('utf-8')
+            data = process_message(data)
 
-c.close()
+            print('Received message: {}'.format(data))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        c.close()
+
+
+if __name__ == '__main__':
+    main()
