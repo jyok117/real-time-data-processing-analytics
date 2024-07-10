@@ -39,7 +39,7 @@ The services include Kafka, Zookeeper, OpenSearch, OpenSearch Dashboards, `my-py
 $ docker-compose up
 ```
 
-The `my-python-producer` generates random user login data and sends it to the Kafka topic `user-login`. The `consumer-1` consumes messages from the Kafka topic `user-login`, processes the messages, and sends the processed messages to the Kafka topic `processed-user-login`. The `consumer-2` then consumes messages from the Kafka topic `processed-user-login`, indexes the messages to an OpenSearch index `processed-user-login-index`.
+The `my-python-producer` generates random user login data and sends it to the Kafka topic `user-login`. The [`consumer-1`](./src/consumer-1.py) consumes messages from the Kafka topic `user-login`, processes the messages, and sends the processed messages to the Kafka topic `processed-user-login`. The [`consumer-2`](./src/consumer-2.py) then consumes messages from the Kafka topic `processed-user-login`, indexes the messages to an OpenSearch index `processed-user-login-index`.
 
 The credentials for the OpenSearch and OpenSearch Dashboards are `admin:admin`.
 
@@ -105,6 +105,7 @@ The consumer-2 is a Python script that reads messages from the Kafka topic `proc
 ```bash
 $ python -m venv .venv
 $ source .venv/bin/activate
+(.venv) $ cd src/
 (.venv) $ pip install -r requirements.txt
 (.venv) $ python consumer-1.py &
 (.venv) $ python consumer-2.py &
