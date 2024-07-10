@@ -4,6 +4,15 @@ Fetch Data Ops / Data Engineer Take Home Exercise - Real Time Data Processing an
 
 ![](./assets/tools.png)
 
+## Table of Contents
+
+- [Demo](#demo)
+- [Setup](#setup)
+- [Workflow](#workflow)
+- [Additional Questions](#additional-questions)
+
+---
+
 ## Demo
 
 ![](https://github.com/jyok117/real-time-data-processing-analytics/blob/main/assets/analytics-demo.gif)
@@ -90,6 +99,37 @@ flowchart TD
     F --> G[[opensearch dashboard
         visualizations]]
 ```
+
+## Additional Questions
+
+### How would you deploy this application in production?
+
+Deploying this application in production involves several steps to ensure it runs reliably, securely, and efficiently.
+
+1. Use a Container Orchestration Platform (Kubernetes) and Infrastructure as Code tools (Terraform) to define and provision the infrastructure. Use managed Kubernetes services like AWS EKS, or Azure AKS to simplify management and scaling.
+2. Set up persistent volumes for services that require data persistence, such as OpenSearch.
+3. Use Kubernetes services to expose the application to external traffic. Implement Ingress controllers for routing external traffic to the appropriate services.
+4. Use monitoring tools like Prometheus and Grafana to monitor the health and performance of the application. Set up centralized logging using tools like Fluentd.
+5. Use Kubernetes secrets or services like HashiCorp Vault for managing sensitive information
+
+### What other components would you want to add to make this production-ready?
+
+To make this application production-ready, consider adding the following components:
+
+1. Integrate security scanning for container images (e.g., Trivy) within the CI/CD pipeline.
+2. Implement backup solutions for OpenSearch and other stateful services.
+3. Configure Kubernetes to automatically scale (horizontal) the number of pods based on CPU/memory usage. Use cluster autoscalers to add or remove nodes based on the overall demand.
+4. Manage application configuration using Kubernetes ConfigMaps and Secrets.
+
+### How can this application scale with a growing dataset?
+
+Scaling the application to handle a growing dataset involves several strategies:
+
+1. Use partitioned Kafka topics to distribute the load across multiple brokers. Deploy multiple instances of consumer services to parallelize data processing.
+2. Use sharding in OpenSearch to distribute data across multiple nodes.
+3. Optimize OpenSearch indices by adjusting shard count, replication factor, and using index templates.
+4. Add more instances of your services to handle increased load (Horizontal Scaling). Increase the resources (CPU, memory) allocated to your services (Vertical Scaling).
+5. Use load balancers to distribute traffic across multiple instances of your services.
 
 ## Producer
 
