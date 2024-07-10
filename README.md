@@ -43,12 +43,14 @@ $ docker-compose up --build
 
 The `my-python-producer` generates random user login data and sends it to the Kafka topic `user-login`.
 
-Check if the Kafka is receiving the data from the `my-python-producer`
+Check if the Kafka is receiving the data from the `my-python-producer`.
 
 ```bash
 $ KAFKA_CONTAINER=$(docker ps --filter "name=kafka" --format "{{.ID}}")
 $ docker exec -it $KAFKA_CONTAINER kafka-console-consumer --bootstrap-server localhost:9092 --topic user-login --group my-app
 ```
+
+If there is no group associated with the consumer, you can create the group by running the above command.
 
 The [`consumer-1`](./src/consumer-1.py) consumes messages from the Kafka topic `user-login`, processes the messages, and sends the processed messages to the Kafka topic `processed-user-login`. The [`consumer-2`](./src/consumer-2.py) then consumes messages from the Kafka topic `processed-user-login`, indexes the messages to an OpenSearch index `processed-user-login-index`.
 
@@ -66,7 +68,9 @@ This will create the dashboard with visualizations and the required index patter
 OpenSearch Dashboard -> Dashboard -> Real-Time Data Processing and Analytics
 ```
 
-![](./assets/dashboard.png)
+Set the time range to `Last 15 minutes` and refresh time to `Every 1 second` to see the real-time data.
+
+![](./assets/timer.png)
 
 ## Workflow
 
